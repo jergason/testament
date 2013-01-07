@@ -1,0 +1,25 @@
+require.config({
+  baseUrl: '../../',
+  paths: {
+    // requirejs plugins
+    text: 'public/js/requirejs/text',
+    cs: 'public/js/requirejs/cs',
+    'coffee-script': 'public/js/CoffeeScript'
+  }
+})
+
+
+
+define(function(require) {
+    // require all test files
+    {{#each files}}
+    require({{{fileName}}})
+    {{/each}}
+    if (window.mochaPhantomJS) {
+      mochaPhantomJS.run()
+    }
+    else {
+      mocha.run()
+    }
+  })
+})
