@@ -2,6 +2,7 @@ var path = require('path')
 var express = require('express')
 var q = require('q')
 var getTemplatedTestFile = require('./lib/createTemplate')
+var runPhantom = require('./lib/runPhantom')
 
 var argv = require('optimist')
   .usage('Run a single test or directory fill of tests. Usage: $0 [TEST_PATH]')
@@ -36,24 +37,16 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
     res.send(templatedTestFile)
   })
 
-  server.listen(PORT)
-  console.log('listening!')
-  server.on('listening', function() {
+
+  server.listen(PORT, function () {
+    console.log('listening')
     templatedTestFilePromise.then(function(t) {
-      console.log('wut wut is this?')
       templatedTestFile = t
+      //console.log('t is', t)
       deferred.resolve(PORT)
     }, handleError).done()
-    console.log('listening fired')
   })
   return deferred.promise
-}
-
-function runPhantom(port) {
-  return port
-  // Start mocha-phantomjs in a subprocess
-  // pipe output to stdout
-  // return the statuscode?
 }
 
 function reportResults(results) {

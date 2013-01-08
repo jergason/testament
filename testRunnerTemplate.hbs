@@ -13,7 +13,7 @@ require.config({
 define(function(require) {
     // require all test files
     {{#each files}}
-    require({{{fileName}}})
+    require('{{{fileName}}}')
     {{/each}}
     if (window.mochaPhantomJS) {
       mochaPhantomJS.run()
