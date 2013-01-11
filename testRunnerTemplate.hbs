@@ -11,15 +11,26 @@ require.config({
 
 
 define(function(require) {
-    // require all test files
-    {{#each files}}
-    require('{{{fileName}}}')
-    {{/each}}
-    if (window.mochaPhantomJS) {
-      mochaPhantomJS.run()
+   var numberOfTests = {{files.length}}
+   var requiredTests = 0
+   var mochaRan = false
+
+  function testRequired() {
+    requiredTests++
+    if (numberOfTests >= requiredTests && !mochaRan) {
+      mochaRan = true
+      console.log('running tests yo!')
+      if (window.mochaPhantomJS) {
+        mochaPhantomJS.run()
+      }
+      else {
+        mocha.run()
+      }
     }
-    else {
-      mocha.run()
-    }
+  }
+  // require all test files
+  {{#each files}}
+  require('{{{fileName}}}').onRequired(testRequired)
+  {{/each}}
   })
 })

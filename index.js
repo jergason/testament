@@ -5,21 +5,21 @@ var q = require('q')
 var getTemplatedTestFile = require('./lib/createTemplate')
 
 var argv = require('optimist')
-  .usage('Run a single test or directory fill of tests. Usage: $0 [TEST_PATH]')
+  .usage('Run a single test or directory fill of tests. Usage: $0 [OPTIONS] [TEST_PATH]')
   .demand('b')
   .alias('b', 'basedir')
-  .describe('b', 'base directory to served by web server. test files will be relative to this path.')
+  .describe('b', 'base directory served by web server. test files will be relative to this path.')
   .demand('t')
   .alias('t', 'template')
   .describe('t', 'path to template to insert test files into')
   .demand('r')
   .alias('r', 'runner')
   .describe('r', 'path to HTML test runner file that runs the mocha tests')
-  .default({
-    b: '/Users/jergason/itv/Vino',
-    t: '/Users/jergason/itv/testament/testRunnerTemplate.hbs',
-    r: '/Users/jergason/itv/Vino/test/public/TestRunner.html'
-  })
+  //.default({
+    //b: '/Users/jergason/itv/Vino',
+    //t: '/Users/jergason/itv/testament/testRunnerTemplate.hbs',
+    //r: '/Users/jergason/itv/Vino/test/public/TestRunner.html'
+  //})
   .argv
 
 var pathToTest = argv._[0]
@@ -62,10 +62,8 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
 
 
   server.listen(PORT, function () {
-    console.log('listening')
     templatedTestFilePromise.then(function(t) {
       templatedTestFile = t
-      //console.log('t is', t)
       deferred.resolve()
     }, handleError).done()
   })
@@ -74,7 +72,6 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
 
 function runPhantom(testFile) {
   return function() {
-    console.log('calling runPhantom')
     var deferred = q.defer()
     var phantom = exec('mocha-phantomjs ' + testFile, function(err, stdout, stderr) {
       deferred.resolve([err, stdout, stderr])
@@ -84,7 +81,11 @@ function runPhantom(testFile) {
 }
 
 function reportResults(results) {
-  console.log('results are', results)
+  console.log(results[1])
+  // if mocha exited with an error code
+  if (results[0] && results[0].code) {
+    process.exit(results[0].code)
+  }
   process.exit(0)
 }
 
