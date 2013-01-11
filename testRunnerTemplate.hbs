@@ -8,12 +8,10 @@ require.config({
   }
 })
 
-
-
 define(function(require) {
-   var numberOfTests = {{files.length}}
-   var requiredTests = 0
-   var mochaRan = false
+  var numberOfTests = {{files.length}}
+  var requiredTests = 0
+  var mochaRan = false
 
   function testRequired() {
     requiredTests++
@@ -32,5 +30,4 @@ define(function(require) {
   {{#each files}}
   require('{{{fileName}}}').onRequired(testRequired)
   {{/each}}
-  })
 })
