@@ -15,6 +15,12 @@ Testament is a small app that takes in a path to a test or folder containing
 tests and will automatically fill out your test-runner file so that specific
 test, or directory of tests will be run in Mocha-phantomjs.
 
+## Usage
+
+```bash
+npm install -g testament
+```
+
 ## Roadmap
 * Support other test runners
 * Support arbitrary templates

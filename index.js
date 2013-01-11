@@ -15,11 +15,9 @@ var argv = require('optimist')
   .demand('r')
   .alias('r', 'runner')
   .describe('r', 'path to HTML test runner file that runs the mocha tests')
-  //.default({
-    //b: '/Users/jergason/itv/Vino',
-    //t: '/Users/jergason/itv/testament/testRunnerTemplate.hbs',
-    //r: '/Users/jergason/itv/Vino/test/public/TestRunner.html'
-  //})
+  .default({
+    t: path.join(__dirname, 'testRunnerTemplate.hbs')
+  })
   .argv
 
 var pathToTest = argv._[0]
@@ -55,7 +53,7 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   server.use(express.static(staticFilePath))
 
   // override request for actual test runner url so we send back tepmlated tests
-  server.get('test/public/allTests.js', function(req, res) {
+  server.get('/test/public/allTests.js', function(req, res) {
     res.set('Content-Type', 'text/javascript')
     res.send(templatedTestFile)
   })
@@ -64,16 +62,16 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   server.listen(PORT, function () {
     templatedTestFilePromise.then(function(t) {
       templatedTestFile = t
-      deferred.resolve()
+      deferred.resolve(PORT)
     }, handleError).done()
   })
   return deferred.promise
 }
 
 function runPhantom(testFile) {
-  return function() {
+  return function(PORT) {
     var deferred = q.defer()
-    var phantom = exec('mocha-phantomjs ' + testFile, function(err, stdout, stderr) {
+    var phantom = exec('mocha-phantomjs ' + 'http://localhost:'+ PORT + '/' + testFile, function(err, stdout, stderr) {
       deferred.resolve([err, stdout, stderr])
     })
     return deferred.promise
