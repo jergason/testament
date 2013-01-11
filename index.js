@@ -5,23 +5,17 @@ var q = require('q')
 var getTemplatedTestFile = require('./lib/createTemplate')
 
 var argv = require('optimist')
-  .usage('Run a single test or directory fill of tests. Usage: $0 [OPTIONS] [TEST_PATH]')
-  .demand('b')
-  .alias('b', 'basedir')
-  .describe('b', 'base directory served by web server. test files will be relative to this path.')
-  .demand('t')
-  .alias('t', 'template')
-  .describe('t', 'path to template to insert test files into')
-  .demand('r')
-  .alias('r', 'runner')
-  .describe('r', 'path to HTML test runner file that runs the mocha tests')
-  .default({
-    t: path.join(__dirname, 'testRunnerTemplate.hbs')
-  })
+  .usage('Run a single test or directory fill of tests. Usage: $0 [TEST_PATH]')
   .argv
 
-var pathToTest = argv._[0]
+// Some paths to important files. Redefine these to make sense for you
+// assume this file is in /node_modules/testament of our app
+var baseDir = path.resolve('../../')
+var testTemplatePath = path.resolve('testRunnerTemplate.hbs')
+var testHtmlPath = path.resolve('TestRunner.html')
+var testRunnerFile = '/test/public/allTests.js'
 
+var pathToTest = argv._[0]
 
 function handleError(err) {
   console.error("Error running tests:", err.stack)
@@ -53,11 +47,10 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   server.use(express.static(staticFilePath))
 
   // override request for actual test runner url so we send back tepmlated tests
-  server.get('/test/public/allTests.js', function(req, res) {
+  server.get(testRunnerFile, function(req, res) {
     res.set('Content-Type', 'text/javascript')
     res.send(templatedTestFile)
   })
-
 
   server.listen(PORT, function () {
     templatedTestFilePromise.then(function(t) {
@@ -87,4 +80,4 @@ function reportResults(results) {
   process.exit(0)
 }
 
-runTests(pathToTest, argv.b, argv.t, argv.r)
+runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath)
