@@ -1,13 +1,16 @@
 {
   "name": "testament",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Server for running mocha requirejs test suites in phantomjs with one command",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "bin": "hurp durp"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jergason/testament"
+  },
   "author": "Jamison Dance (http://jamisondance.com) <jergason@gmail.com>",
   "license": "BSD",
   "dependencies": {

@@ -10,10 +10,10 @@ var argv = require('optimist')
 
 // Some paths to important files. Redefine these to make sense for you
 // assume this file is in /node_modules/testament of our app
-var baseDir = path.resolve('../../')
-var testTemplatePath = path.resolve('testRunnerTemplate.hbs')
-var testHtmlPath = path.resolve('TestRunner.html')
-var testRunnerFile = '/test/public/allTests.js'
+var baseDir = path.resolve(path.join(__dirname, '../../'))
+var testTemplatePath = path.resolve(path.join(__dirname, 'testRunnerTemplate.hbs'))
+var testHtmlPath = 'node_modules/testament/TestRunner.html'
+var testRunnerFile = '/node_modules/testament/allTests.js'
 
 var pathToTest = argv._[0]
 
@@ -48,6 +48,7 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
 
   // override request for actual test runner url so we send back tepmlated tests
   server.get(testRunnerFile, function(req, res) {
+    console.log('testRunner requested!')
     res.set('Content-Type', 'text/javascript')
     res.send(templatedTestFile)
   })
