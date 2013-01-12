@@ -48,7 +48,6 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
 
   // override request for actual test runner url so we send back tepmlated tests
   server.get(testRunnerFile, function(req, res) {
-    console.log('testRunner requested!')
     res.set('Content-Type', 'text/javascript')
     res.send(templatedTestFile)
   })
