@@ -15,12 +15,40 @@ Testament is a small app that takes in a path to a test or folder containing
 tests and will automatically fill out your test-runner file so that specific
 test, or directory of tests will be run in Mocha-phantomjs.
 
-## Usage
+## Installation
+
+Testament depends on
+[mocha-phantomjs](https://github.com/metaskills/mocha-phantomjs) being installed
+and in your path already. See the docs for installation instructions.
 
 ```bash
-npm install -g testament
+npm install testament
 ```
 
-## Roadmap
+## Useage
+
+Testament makes lots of assumptions.
+
+* The tests are AMD modules which mock their dependencies with
+  [Squire.js](https://github.com/iammerrick/Squire.js)
+* The tests all return their Squire object so the test runner can listen on
+  Squire's onRequired callback
+
+You can change some of these assumptions by editing the testRunnerTemplate.hbs
+or changing the variables in index.js.
+
+If everything is set up correctly, run testament by pointing it to a file or
+directory containing tests.
+
+```bash
+node_modules/testament/index.js test/public/models/
+```
+
+This will expect all files in the test/public/models directory to be javascript
+tests, and attempt to run them all. You should see the mocha output in your
+console.
+
+## TODO
 * Support other test runners
 * Support arbitrary templates
+* Make it not so weirdly specific to our project
