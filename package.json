@@ -1,6 +1,6 @@
 {
   "name": "testament",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Server for running mocha requirejs test suites in phantomjs with one command",
   "main": "app.js",
   "scripts": {
