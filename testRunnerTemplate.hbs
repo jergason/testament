@@ -16,7 +16,7 @@ define(function(require) {
 
   function testRequired() {
     requiredTests++
-    if (numberOfTests >= requiredTests && !mochaRan) {
+    if (requiredTests >= numberOfTests && !mochaRan) {
       mochaRan = true
       if (window.mochaPhantomJS) {
         mochaPhantomJS.run()
