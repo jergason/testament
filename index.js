@@ -31,10 +31,10 @@ function handleError(err) {
  * testHtmlPath - the location of the mocha test runner file
  **/
 function runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath) {
-  startServer(baseDir, pathToTest, testTemplatePath, testHtmlPath)
-    .then(runPhantom(testHtmlPath))
-    .then(reportResults)
-    .fail(handleError).done()
+  startServer(baseDir, pathToTest, testTemplatePath, testHtmlPath).done()
+    //.then(runPhantom(testHtmlPath))
+    //.then(reportResults)
+    //.fail(handleError).done()
 }
 
 function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
@@ -53,6 +53,7 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   })
 
   server.listen(PORT, function () {
+    console.log('server started yo!')
     templatedTestFilePromise.then(function(t) {
       templatedTestFile = t
       deferred.resolve(PORT)
@@ -80,4 +81,10 @@ function reportResults(results) {
   process.exit(0)
 }
 
-runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath)
+module.exports = runTests
+
+// if script is being run
+if (module === require.main) {
+  console.log('running yo!')
+  runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath)
+}

@@ -4,7 +4,7 @@
   "description": "Server for running mocha requirejs test suites in phantomjs with one command",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node_modules/.bin/mocha test/*",
     "bin": "hurp durp"
   },
   "repository": {
@@ -21,6 +21,10 @@
     "findit": "~0.1.2",
     "requirejs": "~2.1.2",
     "chai": "~1.4.2",
+    "mocha": "~1.8.1",
+    "mocha-phantomjs": "~1.1.2"
+  },
+  "devDependencies": {
     "mocha": "~1.8.1"
   }
 }
