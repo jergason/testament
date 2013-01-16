@@ -3,6 +3,7 @@ var exec = require('child_process').exec
 var express = require('express')
 var q = require('q')
 var getTemplatedTestFile = require('./lib/createTemplate')
+var runPhantom = require('./lib/runPhantom')
 
 var argv = require('optimist')
   .usage('Run a single test or directory fill of tests. Usage: $0 [TEST_PATH]')
@@ -31,10 +32,10 @@ function handleError(err) {
  * testHtmlPath - the location of the mocha test runner file
  **/
 function runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath) {
-  startServer(baseDir, pathToTest, testTemplatePath, testHtmlPath).done()
-    //.then(runPhantom(testHtmlPath))
-    //.then(reportResults)
-    //.fail(handleError).done()
+  startServer(baseDir, pathToTest, testTemplatePath, testHtmlPath)
+    .then(runPhantom(testHtmlPath))
+    .then(reportResults)
+    .fail(handleError).done()
 }
 
 function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
@@ -60,16 +61,6 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
     }, handleError).done()
   })
   return deferred.promise
-}
-
-function runPhantom(testFile) {
-  return function(PORT) {
-    var deferred = q.defer()
-    var phantom = exec('mocha-phantomjs ' + 'http://localhost:'+ PORT + '/' + testFile, function(err, stdout, stderr) {
-      deferred.resolve([err, stdout, stderr])
-    })
-    return deferred.promise
-  }
 }
 
 function reportResults(results) {
