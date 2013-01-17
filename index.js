@@ -63,10 +63,13 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   return deferred.promise
 }
 
+// results is [err, stdout, stderr] from execing phantomjs
 function reportResults(results) {
   console.log(results[1])
   // if mocha exited with an error code
   if (results[0] && results[0].code) {
+    // print out stderr
+    console.error(results[2])
     process.exit(results[0].code)
   }
   process.exit(0)
