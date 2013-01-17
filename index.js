@@ -54,7 +54,6 @@ function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
   })
 
   server.listen(PORT, function () {
-    console.log('server started yo!')
     templatedTestFilePromise.then(function(t) {
       templatedTestFile = t
       deferred.resolve(PORT)
@@ -79,6 +78,5 @@ module.exports = runTests
 
 // if script is being run
 if (module === require.main) {
-  console.log('running yo!')
   runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath)
 }
