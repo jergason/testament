@@ -1,11 +1,10 @@
 require.config({
-  baseUrl: '../../../../',
+  baseUrl: '/',
   paths: {
     // requirejs plugins
-    text: 'public/js/requirejs/text',
-    cs: 'public/js/requirejs/cs',
-    'coffee-script': 'public/js/CoffeeScript',
-    'Squire': 'node_modules/testament/Squire'
+    {{#each requireModules}}
+    '{{reqName}}' : '{{reqPath}}',
+    {{/each}}
   }
 })
 
