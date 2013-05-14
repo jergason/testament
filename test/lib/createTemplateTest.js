@@ -4,7 +4,7 @@ var getTemplatedTestFile = require('../../lib/createTemplate')
 describe('getTemplatedTestFile', function() {
   describe('when given a test files path that doesnt exist', function() {
     it('returns a promise fulfilled with an error', function(done) {
-      var promise = getTemplatedTestFile('hurp', 'durp', 'foo')
+      var promise = getTemplatedTestFile('hurp', 'durp', 'foo', [])
       promise.fail(function(err) {
         assert(err)
         done()
@@ -15,7 +15,7 @@ describe('getTemplatedTestFile', function() {
   describe('when there are no CS or JS files', function() {
     describe('when the path is a directory', function() {
       it('returns a promise fulfilled with an error', function(done) {
-        var promise = getTemplatedTestFile(path.join(__dirname, '..', 'data'))
+        var promise = getTemplatedTestFile(path.join(__dirname, '..', 'data'), "", [])
 
         promise.fail(function(err) {
           assert(err)
@@ -27,7 +27,7 @@ describe('getTemplatedTestFile', function() {
 
     describe('when the path is a non-JS or CS file', function() {
       it('returns a promise fulfilled with an error', function(done) {
-        var promise = getTemplatedTestFile(path.join(__dirname, '..', 'data', 'hurp.txt'))
+        var promise = getTemplatedTestFile(path.join(__dirname, '..', 'data', 'hurp.txt'), "", [])
         promise.fail(function(err) {
           assert(err)
           assert(/No JS files found/.test(err.message))
@@ -45,10 +45,11 @@ describe('getTemplatedTestFile', function() {
       var templatePath = path.join(__dirname, '..', 'data', 'template.hbs')
 
       it('returns the template with the files names filled in relative to the base dir in requirejs module path syntax', function(done) {
-        var promise = getTemplatedTestFile(pathToFiles, templatePath, baseDir)
+        var promise = getTemplatedTestFile(pathToFiles, templatePath, baseDir, [])
 
         promise.then(function(template) {
-          assert(/test\/cs_and_js\/bar\s*cs!test\/cs_and_js\/foo/.test(template.trim()))
+          assert(template.indexOf("bar") > -1)
+          assert(template.indexOf("foo") > -1)
           done()
         }).done()
       })
@@ -56,7 +57,7 @@ describe('getTemplatedTestFile', function() {
 
     describe('when given an invalid template path', function() {
       it('returns a promise fulfilled with a meaningful error', function(done) {
-        var promise = getTemplatedTestFile(pathToFiles, 'ashfkajsdfh', baseDir)
+        var promise = getTemplatedTestFile(pathToFiles, 'ashfkajsdfh', baseDir, [])
         promise.fail(function(err) {
           assert(err)
           done()

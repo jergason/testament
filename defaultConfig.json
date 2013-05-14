@@ -1,0 +1,17 @@
+{
+  "rootDir": "../Vino",
+  "publicDir": "public",
+  "testDir": "test/public",
+  "publicMount": "/",
+  "testMount": "/test/",
+  "requireModules": {
+    "text": "js/requirejs/text",
+    "cs": "js/requirejs/cs",
+
+    "backbone": "js/backbone",
+    "jquery": "js/jquery",
+    "underscore": "js/lo-dash",
+    "coffee-script": "js/CoffeeScript"
+
+  }
+}
