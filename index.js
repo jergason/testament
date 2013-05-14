@@ -1,22 +1,37 @@
+#!/usr/bin/env node
 var path = require('path')
 var exec = require('child_process').exec
 var express = require('express')
 var q = require('q')
+var optimist = require('optimist')
+
 var getTemplatedTestFile = require('./lib/createTemplate')
 var runPhantom = require('./lib/runPhantom')
+var config = require('./testamentConfig')
+var DEFAULT_CONFIG = path.resolve(path.join(__dirname, 'defaultConfig.json'))
 
-var argv = require('optimist')
-  .usage('Run a single test or directory fill of tests. Usage: $0 [TEST_PATH]')
+var argv = optimist
+  .usage('Run a single test or directory full of tests. Usage: $0 [TEST_PATH]')
+  .default({c: DEFAULT_CONFIG, v: false})
+  .alias('c', 'config')
+  .describe('c', 'pass testament config')
+  .alias('v', 'verbose')
+  .describe('v', 'print verbose info')
   .argv
+
+
+var pathToTest = argv._[0]
+var config = config(require(argv.config))
+
+if (!pathToTest) {
+  console.log('missing path')
+  optimist.showHelp()
+  process.exit(1)
+}
 
 // Some paths to important files. Redefine these to make sense for you
 // assume this file is in /node_modules/testament of our app
-var baseDir = path.resolve(path.join(__dirname, '../../'))
-var testTemplatePath = path.resolve(path.join(__dirname, 'testRunnerTemplate.hbs'))
-var testHtmlPath = 'node_modules/testament/TestRunner.html'
-var testRunnerFile = '/node_modules/testament/allTests.js'
-
-var pathToTest = argv._[0]
+var testTemplatePath = path.resolve(path.join(__dirname, config.testTemplate))
 
 function handleError(err) {
   console.error("Error running tests:", err.stack)
@@ -26,33 +41,58 @@ function handleError(err) {
 /**
  * Run the tests in pathToTest
  * pathToTest - path to a test file or directory of tests to run
- * baseDir - the path that that will be served by web server. test file paths
- *   will be relative to this path
- * testTemplatePath - the location of the template file to put the tests in
- * testHtmlPath - the location of the mocha test runner file
  **/
-function runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath) {
-  startServer(baseDir, pathToTest, testTemplatePath, testHtmlPath)
-    .then(runPhantom(testHtmlPath))
+function runTests(pathToTest) {
+  startServer(pathToTest)
+    .then(runPhantom())
     .then(reportResults)
     .fail(handleError).done()
 }
 
-function startServer(staticFilePath, pathToTestFiles, pathToTestTemplate) {
+function startServer(pathToTestFiles) {
   // set up server, and magic template
   var server = express()
   var deferred = q.defer()
-  var templatedTestFilePromise = getTemplatedTestFile(pathToTestFiles, pathToTestTemplate)
+  var templatedTestFilePromise = getTemplatedTestFile(pathToTestFiles, testTemplatePath, config.testMount, config.requireModules)
   var templatedTestFile
   var PORT = 3006
-  server.use(express.static(staticFilePath))
+  // using the config, and resolve all the paths
+  var projectRoot = path.resolve(path.join(__dirname, config.rootDir))
+  var publicDir = path.resolve(path.join(projectRoot, config.publicDir))
+  var testDir = path.resolve(path.join(projectRoot, config.testDir))
 
+  // mount the two static file servers, giving a namespace to each one!
+  server.use(config.publicMount, express.static(publicDir))
+  server.use(config.testMount, express.static(testDir))
+
+  var testamentServer = express()
   // override request for actual test runner url so we send back tepmlated tests
-  server.get(testRunnerFile, function(req, res) {
+  testamentServer.get("/" + config.testJs, function(req, res) {
     res.set('Content-Type', 'text/javascript')
     res.send(templatedTestFile)
   })
 
+  function serveFile(partialPath) {
+    var filePath = path.resolve(path.join(__dirname, partialPath))
+    return function(req, res) {
+      res.sendfile(filePath)
+    }
+  }
+  for (var file in config.testamentFiles) {
+    testamentServer.get(file, serveFile(config.testamentFiles[file]))
+  }
+
+  server.use(config.testamentMount, testamentServer)
+  // install a 404 handler so we can inform the user smartly
+  server.use(function(req, res) {
+    console.log("had a 404!", req.url)
+    res.send("Can't find file!", 404)
+  })
+  // inform the user and exit when a 500 happens
+  server.use(function(err, req, res, next) {
+    console.log("Something went wrong in the server!")
+    process.exit(1)
+  })
   server.listen(PORT, function () {
     templatedTestFilePromise.then(function(t) {
       templatedTestFile = t
@@ -78,5 +118,5 @@ module.exports = runTests
 
 // if script is being run
 if (module === require.main) {
-  runTests(pathToTest, baseDir, testTemplatePath, testHtmlPath)
+  runTests(pathToTest)
 }

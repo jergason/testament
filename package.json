@@ -1,11 +1,13 @@
 {
   "name": "testament",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Server for running mocha requirejs test suites in phantomjs with one command",
   "main": "app.js",
   "scripts": {
-    "test": "node_modules/.bin/mocha test/*",
-    "bin": "hurp durp"
+    "test": "mocha test/**/*.js"
+  },
+  "bin": {
+    "testament": "./index.js"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,8 @@
     "requirejs": "~2.1.2",
     "chai": "~1.4.2",
     "mocha": "~1.8.1",
-    "mocha-phantomjs": "~1.1.2"
+    "mocha-phantomjs": "~1.1.2",
+    "underscore": "~1.4.4"
   },
   "devDependencies": {
     "mocha": "~1.8.1"
